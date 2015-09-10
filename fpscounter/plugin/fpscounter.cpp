@@ -34,13 +34,13 @@ FpsCounter::FpsCounter(QQuickItem *parent)
 
 void FpsCounter::checkFpsEnabled()
 {
-    bool showTouch = (!qgetenv("WEBOS_DISPLAY_TOUCH").isEmpty() && QFileInfo::exists(QString("/var/luna/preferences/devmode_enabled")));
+    bool showTouch = (!qgetenv("WEBOS_DISPLAY_TOUCH").isEmpty() && QFileInfo::exists(QString("/var/luna/preferences/fps_enabled")));
     if (showTouch != displayTouch) {
       displayTouch = showTouch;
       emit touchChanged();
     }
 
-    displayFps = (qgetenv("WEBOS_NO_DISPLAY_FPS").isEmpty() && QFileInfo::exists(QString("/var/luna/preferences/devmode_enabled")));
+    displayFps = (qgetenv("WEBOS_NO_DISPLAY_FPS").isEmpty() && QFileInfo::exists(QString("/var/luna/preferences/fps_enabled")));
 
     if(!displayFps) {
         if(viewWindow != NULL) disconnect(viewWindow, SIGNAL(frameSwapped()), this, SLOT(countFps()));
