@@ -41,6 +41,7 @@ class AudioService : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
+    Q_PROPERTY(int volumeMax READ volumeMax NOTIFY volumeMaxChanged)
     Q_PROPERTY(bool muted READ muted NOTIFY mutedChanged)
     Q_PROPERTY(QString scenario READ scenario NOTIFY scenarioChanged)
     Q_PROPERTY(bool disabled READ disabled NOTIFY disabledChanged)
@@ -53,8 +54,8 @@ public:
     ~AudioService();
 
     int volume();
-    int volumeLowerLimit();
-    int volumeUpperLimit();
+    int volumeMin();
+    int volumeMax();
     bool muted();
     QString scenario();
     bool disabled();
@@ -66,6 +67,7 @@ public:
 
 signals:
     void volumeChanged();
+    void volumeMaxChanged();
     void mutedChanged();
     void volumeUpdated();
     void scenarioChanged();
@@ -89,8 +91,8 @@ private:
 
     bool m_muted;
     int m_volume;
-    int m_volumeLowerLimit;
-    int m_volumeUpperLimit;
+    int m_volumeMin;
+    int m_volumeMax;
     QString m_scenario;
     bool m_disabled;
     QString m_appId;
@@ -107,6 +109,7 @@ private:
     void changeVolumeMute(bool mute);
 
     void setVolume(int vol);
+    void setVolumeMax(int vol);
     void setMuted(bool status);
     void setScenario(const QString& scenario);
     void setDisabled(bool status);

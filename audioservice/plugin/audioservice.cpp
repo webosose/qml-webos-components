@@ -40,14 +40,12 @@ AudioService::AudioService(QObject* parent)
     , m_isSubscribed(false)
     , m_muted(false)
     , m_volume(0)
+    , m_volumeMin(0)
+    , m_volumeMax(100)
     , m_scenario(AUDIOSERVICE_SCENARIO_TV_SPEAKER)
     , m_disabled(false)
     , m_serverStatusCookie(NULL)
 {
-
-    // TODO: Get the range from the audio service
-    m_volumeLowerLimit = 0;
-    m_volumeUpperLimit = 100;
 }
 
 AudioService::~AudioService()
@@ -143,14 +141,22 @@ void AudioService::setVolume(int vol)
     }
 }
 
-int AudioService::volumeLowerLimit()
+int AudioService::volumeMin()
 {
-    return m_volumeLowerLimit;
+    return m_volumeMin;
 }
 
-int AudioService::volumeUpperLimit()
+int AudioService::volumeMax()
 {
-    return m_volumeUpperLimit;
+    return m_volumeMax;
+}
+
+void AudioService::setVolumeMax(int vol)
+{
+    if (m_volumeMax != vol) {
+        m_volumeMax = vol;
+        emit volumeMaxChanged();
+    }
 }
 
 bool AudioService::muted()
@@ -350,6 +356,7 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
     if (result) {
         AudioService *svc = static_cast<AudioService *>(ctx);
         int volume = (int)rootObject.find("volume").value().toDouble();
+        int volumeMax = (int)rootObject.find("volumeMax").value().toDouble();
         bool muted = rootObject.find("muted").value().toBool();
         QString scenario = rootObject.find("scenario").value().toString();
         QString cause = rootObject.find("cause").value().toString();
@@ -359,12 +366,11 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
             svc->m_isSubscribed = true;
         }
 
-        // FIXME: Keep this until audiod is fixed
-        if (volume > svc->volumeUpperLimit()) {
-            volume = svc->volumeUpperLimit();
+        if (volume > svc->volumeMax()) {
+            volume = svc->volumeMax();
         }
-        else if (volume < svc->volumeLowerLimit()) {
-            volume = svc->volumeLowerLimit();
+        else if (volume < svc->volumeMin()) {
+            volume = svc->volumeMin();
         }
 
         // Update values
@@ -374,6 +380,7 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
                 svc->setChanged(changed);
             }
             svc->setVolume(volume);
+            svc->setVolumeMax(volumeMax);
             svc->setMuted(muted);
             svc->setScenario(scenario);
             svc->setCause(cause);
