@@ -366,10 +366,10 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
             svc->m_isSubscribed = true;
         }
 
-        if (volume > svc->volumeMax()) {
-            volume = svc->volumeMax();
+        if (volume > volumeMax) {
+            volume = volumeMax;
         }
-        else if (volume < svc->volumeMin()) {
+        if (volume < svc->volumeMin()) {
             volume = svc->volumeMin();
         }
 
