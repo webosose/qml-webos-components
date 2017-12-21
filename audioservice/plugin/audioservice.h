@@ -48,6 +48,7 @@ class AudioService : public QObject
     Q_PROPERTY(QString appId READ appId WRITE setAppId NOTIFY appIdChanged)
     Q_PROPERTY(QString cause READ cause NOTIFY causeChanged)
     Q_PROPERTY(QStringList changed READ changed NOTIFY changedChanged)
+    Q_PROPERTY(QString volumeOsd READ volumeOsd NOTIFY volumeOsdChanged)
 
 public:
     AudioService(QObject* parent = 0);
@@ -61,6 +62,7 @@ public:
     bool disabled();
     QString cause();
     QStringList changed();
+    QString volumeOsd();
 
     QString appId() { return m_appId; }
     void setAppId(const QString& appId);
@@ -75,6 +77,7 @@ signals:
     void appIdChanged();
     void causeChanged();
     void changedChanged();
+    void volumeOsdChanged();
 
 public :
     Q_INVOKABLE void volumeUp();
@@ -99,6 +102,7 @@ private:
     QString m_cause;
     QStringList m_changed;
     void* m_serverStatusCookie;
+    QString m_volumeOsd;
 
     bool attachLSBus();
     bool detachLSBus();
@@ -115,6 +119,7 @@ private:
     void setDisabled(bool status);
     void setCause(const QString& cause);
     void setChanged(const QStringList& changed);
+    void setVolumeOsd(const QString& volumeOsd);
 
     bool requestService(const char *uri, const char *payload, LSFilterFunc callback = NULL);
     static bool handleVolumeUpdate(LSHandle *handle, LSMessage *reply, void *ctx);

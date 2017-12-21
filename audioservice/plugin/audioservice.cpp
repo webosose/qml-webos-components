@@ -31,6 +31,7 @@
 
 // Audio scenario
 #define AUDIOSERVICE_SCENARIO_TV_SPEAKER    "mastervolume_tv_speaker"
+#define AUDIOSERVICE_VOLUMEOSD_DEFAULT    "default"
 
 AudioService::AudioService(QObject* parent)
     : QObject(parent)
@@ -45,6 +46,7 @@ AudioService::AudioService(QObject* parent)
     , m_scenario(AUDIOSERVICE_SCENARIO_TV_SPEAKER)
     , m_disabled(false)
     , m_serverStatusCookie(NULL)
+    , m_volumeOsd(AUDIOSERVICE_VOLUMEOSD_DEFAULT)
 {
 }
 
@@ -224,6 +226,19 @@ void AudioService::setChanged(const QStringList& changed)
     }
 }
 
+QString AudioService::volumeOsd()
+{
+    return m_volumeOsd;
+}
+
+void AudioService::setVolumeOsd(const QString& volumeOsd)
+{
+    if (m_volumeOsd != volumeOsd) {
+        m_volumeOsd = volumeOsd;
+        emit volumeOsdChanged();
+    }
+}
+
 void AudioService::volumeUp()
 {
     requestService(AUDIOSERVICE_API_VOLUME_UP, "{}", AudioService::handleVolumeUpdate);
@@ -360,6 +375,7 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
         bool muted = rootObject.find("muted").value().toBool();
         QString scenario = rootObject.find("scenario").value().toString();
         QString cause = rootObject.find("cause").value().toString();
+        QString volumeOsd = rootObject.find("volumeOsd").value().toString();
 
         // Set subscribed upon "subscribed":true
         if (!svc->m_isSubscribed && subscribed) {
@@ -385,6 +401,7 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
             svc->setScenario(scenario);
             svc->setCause(cause);
             svc->setDisabled(false);
+            svc->setVolumeOsd(volumeOsd);
         }
         else if (action == "disabled") {
             svc->setDisabled(true);
