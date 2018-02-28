@@ -1,0 +1,10 @@
+.project
+.cproject
+BUILD*/
+/build
+release-*/
+debug-*/
+patches/
+.obj
+.pch
+.moc

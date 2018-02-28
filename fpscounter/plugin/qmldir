@@ -1,0 +1,3 @@
+module FpsCounter
+FpsItem 1.0 FpsItem.qml
+plugin fpscounterplugin

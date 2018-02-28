@@ -1,0 +1,5 @@
+module WebOS.Global
+
+WebOSMouseArea 1.0 WebOSMouseArea.qml
+
+plugin webosglobalplugin

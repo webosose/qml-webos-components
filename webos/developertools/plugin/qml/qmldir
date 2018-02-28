@@ -1,0 +1,5 @@
+module WebOS.DeveloperTools
+DebugConsole 1.0 DebugConsole.qml
+MemoryView 1.0 MemoryView.qml
+ResourceView 1.0 ResourceView.qml
+plugin devtools

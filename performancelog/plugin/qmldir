@@ -1,0 +1,2 @@
+module PerformanceLog
+plugin performancelogplugin
