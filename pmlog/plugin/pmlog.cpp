@@ -88,11 +88,10 @@ void PmLog::debug(const QString &freeText)
 void PmLog::LogString(int level, const QString &messageId, const QJsonObject &keyVals, const QString &freeText)
 {
     openlog(m_context.toStdString().c_str(), 0, 0);
-    if(level == LOG_DEBUG) {
+    if (level == LOG_DEBUG)
         syslog(m_context.toStdString().c_str(), "%s", freeText.toStdString().c_str());
-    } else if(messageId != NULL) {
+    else if (messageId != NULL)
         syslog(m_context.toStdString().c_str(), "%s %s %s", messageId.toStdString().c_str(), keyVals.toStdString().c_str(), freeText.toStdString().c_str());
-    }
     closelog();
 }
 
@@ -102,20 +101,20 @@ void PmLog::LogString(int level, const QString &messageId, const QJsonObject &ke
 {
     PmLogContext qmlContext;
     PmLogGetContext(m_context.toStdString().c_str(), &qmlContext);
-    if(level == kPmLogLevel_Debug) {
+    if (level == kPmLogLevel_Debug) {
         PmLogString(qmlContext, (PmLogLevel)level, NULL, NULL, freeText.toStdString().c_str());
-    } else if(messageId != NULL) {
-        if(keyVals.empty() == false) {
-            QJsonObject keyValPairs = keyVals;
-            if (withClock) {
-                struct timespec currentTime;
-                if (clock_gettime(CLOCK_MONOTONIC, &currentTime) == 0) {
-                    QString clockStr = QString("%1.%2")
-                                       .arg(currentTime.tv_sec)
-                                       .arg(currentTime.tv_nsec / 1000000, 3, 10, QChar('0'));
-                    keyValPairs.insert("CLOCK", QJsonValue(clockStr.toDouble()));
-                }
+    } else if (messageId != NULL) {
+        QJsonObject keyValPairs = keyVals;
+        if (withClock) {
+            struct timespec currentTime;
+            if (clock_gettime(CLOCK_MONOTONIC, &currentTime) == 0) {
+                QString clockStr = QString("%1.%2")
+                                   .arg(currentTime.tv_sec)
+                                   .arg(currentTime.tv_nsec / 1000000, 3, 10, QChar('0'));
+                keyValPairs.insert("CLOCK", QJsonValue(clockStr.toDouble()));
             }
+        }
+        if (keyValPairs.empty() == false) {
             QJsonDocument keyValsDoc(keyValPairs);
             PmLogString(qmlContext, (PmLogLevel)level, messageId.toStdString().c_str(), keyValsDoc.toJson().constData(), freeText.toStdString().c_str());
         } else {
