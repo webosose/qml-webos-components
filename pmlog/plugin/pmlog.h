@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -62,12 +62,9 @@ public slots:
     /*
      * logging interfaces
      */
-    void emergency(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
-    void alert(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
     void critical(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
     void error(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
     void warning(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
-    void notice(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL);
     void info(const QString &messageId, const QJsonObject &keyVals = PmLog::getDefaultKeyValues(), const QString &freeText = NULL, bool withClock = false);
     void debug(const QString &freeText = NULL);
 };
