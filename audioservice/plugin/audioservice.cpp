@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ bool AudioService::attachLSBus()
         }
     }
 
-    if (!LSRegisterPubPriv(m_appId.toUtf8().constData(), &m_handle, false, NULL)) {
-        qDebug() << __PRETTY_FUNCTION__ << "failed to LSRegisterPubPriv!!";
+    if (!LSRegister(m_appId.toUtf8().constData(), &m_handle, NULL)) {
+        qDebug() << __PRETTY_FUNCTION__ << "failed to LSRegister!!";
         g_main_loop_unref(m_mainLoop);
         m_mainLoop = NULL;
         return false;
