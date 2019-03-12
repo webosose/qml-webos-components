@@ -66,7 +66,13 @@ MouseArea {
     // For the "Difference 2" situation described above,
     // containsMouseInternal should depend on current cursor visible state
     // to prevent signaling "entered" in that situation.
-    onEntered: containsMouseInternal = cursorVisible
+    onEntered: { containsMouseInternal = cursorVisible; touchPressedInternal = cursorVisible ? false : true }
 
-    onExited: containsMouseInternal = false
+    onExited: { containsMouseInternal = false; touchPressedInternal = false }
+
+    onPressed: touchPressedInternal = cursorVisible ? false : true;
+
+    onReleased: touchPressedInternal = false;
+
+    onCanceled: touchPressedInternal = false;
 }
