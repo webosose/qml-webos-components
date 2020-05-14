@@ -25,15 +25,13 @@ import QtQuick 2.4
 WebOSMouseAreaInternal {
     // Override existing attributes
     property bool containsMouse: containsMouseInternal
-    property bool touchPress: touchPressedInternal
-    property bool touchPressedInternal: false
 
     // Provides highlight property for this area.
     // The basic concept is,
     // 1. Disable the highlight when cursor is visible.
     // 2. If the cursor is not visible, enable the highlight.
     property bool highlight: (cursorVisible && containsMouse) ||
-                             (!cursorVisible && (parent.activeFocus||touchPress))
+                             (!cursorVisible && parent.activeFocus)
 
     signal entered
     signal exited
