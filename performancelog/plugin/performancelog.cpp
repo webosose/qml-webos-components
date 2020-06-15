@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ void PerformanceLog::timeEnd(const QString &messageId, const QJsonObject &keyVal
     }
 }
 
+#ifndef HAS_PMLOGLIB
 void PerformanceLog::logInfoWithClock(const QString &messageId, const QJsonObject &keyVals, const QString &freeText)
 {
     struct timespec currentTime;
@@ -106,6 +107,36 @@ void PerformanceLog::logInfoWithClock(const QString &messageId, const QJsonObjec
 
     timeLog(messageId, keyValPairs, freeText);
 }
+#else
+void PerformanceLog::logInfoWithClock(const QString &messageId, const QJsonObject &keyVals, const QString &freeText)
+{
+    PmLogContext qmlContext;
+    PmLogGetContext(m_context.toStdString().c_str(), &qmlContext);
+
+    QJsonObject keyValPairs = keyVals;
+    QString type, group;
+
+    QString str_PerfType = QStringLiteral("PerfType");
+    QString str_PerfGroup = QStringLiteral("PerfGroup");
+
+    if (keyValPairs.contains(str_PerfType) && keyValPairs.value(str_PerfType).isString()) {
+        type = keyValPairs.value(str_PerfType).toString();
+        keyValPairs.remove(str_PerfType);
+    }
+
+    if (keyValPairs.contains(str_PerfGroup) && keyValPairs.value(str_PerfGroup).isString()) {
+        group = keyValPairs.value(str_PerfGroup).toString();
+        keyValPairs.remove(str_PerfGroup);
+    }
+
+    QJsonDocument keyValPairsDoc(keyValPairs);
+
+    PmLogInfoWithClock(qmlContext, messageId.toStdString().c_str(), 2,
+        PMLOGKS("PerfType", type.toStdString().c_str()),
+        PMLOGKS("PerfGroup", group.toStdString().c_str()),
+        "%s %s", keyValPairsDoc.toJson(QJsonDocument::Compact).constData(), (freeText.isEmpty() ? "" : freeText.toStdString().c_str()));
+}
+#endif
 
 int PerformanceLog::timeDiff(const struct timespec& startTime, const struct timespec& endTime)
 {
