@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 LG Electronics, Inc.
+# Copyright (c) 2015-2020 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ uri = WebOS.Global
 installPath = $$WEBOS_INSTALL_QML/$$replace(uri, \\., /)
 
 DEFINES += \
+    WEBOS_INSTALL_WEBOS_APPLICATIONSDIR=\\\"$$WEBOS_INSTALL_WEBOS_APPLICATIONSDIR\\\" \
     WEBOS_INSTALL_QML=\\\"$$WEBOS_INSTALL_QML\\\" \
     WEBOS_QT_LOCALIZATION_QM_BASEDIR=\\\"$$WEBOS_QT_LOCALIZATION_QM_BASEDIR\\\"
 
