@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2020 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,11 +87,14 @@ void PmLog::debug(const QString &freeText)
 #ifndef HAS_PMLOGLIB
 void PmLog::LogString(int level, const QString &messageId, const QJsonObject &keyVals, const QString &freeText)
 {
+    QJsonDocument keyValsDoc(keyVals);
+    QString keyValsStr(keyValsDoc.toJson(QJsonDocument::Compact));
+
     openlog(m_context.toStdString().c_str(), 0, 0);
     if (level == LOG_DEBUG)
         syslog(m_context.toStdString().c_str(), "%s", freeText.toStdString().c_str());
     else if (messageId != NULL)
-        syslog(m_context.toStdString().c_str(), "%s %s %s", messageId.toStdString().c_str(), keyVals.toStdString().c_str(), freeText.toStdString().c_str());
+        syslog(m_context.toStdString().c_str(), "%s %s %s", messageId.toStdString().c_str(), keyValsStr.toStdString().c_str(), freeText.toStdString().c_str());
     closelog();
 }
 
@@ -116,7 +119,7 @@ void PmLog::LogString(int level, const QString &messageId, const QJsonObject &ke
         }
         if (keyValPairs.empty() == false) {
             QJsonDocument keyValsDoc(keyValPairs);
-            PmLogString(qmlContext, (PmLogLevel)level, messageId.toStdString().c_str(), keyValsDoc.toJson().constData(), freeText.toStdString().c_str());
+            PmLogString(qmlContext, (PmLogLevel)level, messageId.toStdString().c_str(), keyValsDoc.toJson(QJsonDocument::Compact).constData(), freeText.toStdString().c_str());
         } else {
             PmLogString(qmlContext, (PmLogLevel)level, messageId.toStdString().c_str(), NULL, freeText.toStdString().c_str());
         }
