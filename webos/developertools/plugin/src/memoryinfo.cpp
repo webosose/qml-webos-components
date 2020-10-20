@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -141,7 +141,11 @@ void MemoryInfo::Mapping::read(MemoryInfo* info, QTextStream* in)
         QString line = in->readLine();
         if (line.endsWith("kB")) {
             QString splitMe = line.left(line.indexOf("kB"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+            QStringList split = splitMe.split(":", Qt::SkipEmptyParts);
+#else
             QStringList split = splitMe.split(":", QString::SkipEmptyParts);
+#endif
 
             QString category = split.at(0).trimmed();
             int value = split.at(1).trimmed().toInt();

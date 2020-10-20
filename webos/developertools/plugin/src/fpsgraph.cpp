@@ -29,7 +29,7 @@ public:
         setFlag(QSGNode::UsePreprocess);
         timer.start();
     }
-    void preprocess() Q_DECL_OVERRIDE {
+    void preprocess() override {
         int delta = timer.elapsed();
         timer.restart();
         msecs.append(delta);

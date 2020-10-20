@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,7 +101,11 @@ inline void mappingAppend(QQmlListProperty<MemoryInfo::Mapping>* p, MemoryInfo::
     reinterpret_cast<QList<MemoryInfo::Mapping*> *>(p->data)->append(s);
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+inline MemoryInfo::Mapping* mappingAt(QQmlListProperty<MemoryInfo::Mapping>* p, qsizetype idx)
+#else
 inline MemoryInfo::Mapping* mappingAt(QQmlListProperty<MemoryInfo::Mapping>* p, int idx)
+#endif
 {
     return reinterpret_cast<QList<MemoryInfo::Mapping*> *>(p->data)->at(idx);
 }
@@ -111,7 +115,11 @@ inline void mappingClear(QQmlListProperty<MemoryInfo::Mapping>* p)
     reinterpret_cast<QList<MemoryInfo::Mapping*> *>(p->data)->clear();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+inline qsizetype mappingCount(QQmlListProperty<MemoryInfo::Mapping>* p)
+#else
 inline int mappingCount(QQmlListProperty<MemoryInfo::Mapping>* p)
+#endif
 {
     return reinterpret_cast<QList<MemoryInfo::Mapping*> *>(p->data)->count();
 }
