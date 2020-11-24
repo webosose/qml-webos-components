@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2020 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ void PmLog::LogString(int level, const QString &messageId, const QJsonObject &ke
     PmLogGetContext(m_context.toStdString().c_str(), &qmlContext);
     if (level == kPmLogLevel_Debug) {
         PmLogString(qmlContext, (PmLogLevel)level, NULL, NULL, freeText.toStdString().c_str());
-    } else if (messageId != NULL) {
+    } else if (!messageId.isNull()) {
         QJsonObject keyValPairs = keyVals;
         if (withClock) {
             struct timespec currentTime;
