@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@ Rectangle {
     }
 
     DebugMessageFilter {
-        onDebug: out.text = out.text + '\nDebug: ' + message.text
-        onWarning: out.text = out.text + '\nWarning: ' + message.text
-        onCritical: out.text = out.text + '\nCritical: ' + message.text
-        onFatal: out.text = out.text + '\nFatal: ' + message.text
-        onQmlError: out.text = out.text + '\nQmlError: ' + message.text
+        onDebug: (message) => { out.text = out.text + '\nDebug: ' + message.text; }
+        onWarning: (message) => { out.text = out.text + '\nWarning: ' + message.text; }
+        onCritical: (message) => { out.text = out.text + '\nCritical: ' + message.text; }
+        onFatal: (message) => { out.text = out.text + '\nFatal: ' + message.text; }
+        onQmlError: (message) => { out.text = out.text + '\nQmlError: ' + message.text; }
     }
 
     Component.onCompleted: {

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,11 +85,11 @@ Item {
         }
 
         DebugMessageFilter {
-            onDebug: debugConsole.appendMessage(debugFilter, message, "gray")
-            onWarning: debugConsole.appendMessage(warningFilter, message, "white")
-            onCritical: debugConsole.appendMessage(criticalFilter, message, "orange")
-            onFatal: debugConsole.appendMessage(fatalFilter, message, "red")
-            onQmlError: debugConsole.appendMessage(true, message, "magenta", true)
+            onDebug: (message) => { debugConsole.appendMessage(debugFilter, message, "gray"); }
+            onWarning: (message) => { debugConsole.appendMessage(warningFilter, message, "white"); }
+            onCritical: (message) => { debugConsole.appendMessage(criticalFilter, message, "orange"); }
+            onFatal: (message) => { debugConsole.appendMessage(fatalFilter, message, "red"); }
+            onQmlError: (message) => { debugConsole.appendMessage(true, message, "magenta", true); }
         }
     }
 
@@ -98,18 +98,18 @@ Item {
         MouseArea {
             width: 64; height: 64
             visible: debugConsoleView.visible
-            onClicked: debugConsole.clear()
+            onClicked: (mouse) => { debugConsole.clear(); }
             Text { anchors.centerIn: parent; text: "\u00D7"; color: "white"; font.pixelSize: 48 }
         }
         MouseArea {
             width: 64; height: 64
             visible: debugConsoleView.visible
-            onClicked: unifiedTimer.slowMode = !unifiedTimer.slowMode
+            onClicked: (mouse) => { unifiedTimer.slowMode = !unifiedTimer.slowMode; }
             Text { anchors.centerIn: parent; text: "\u2155"; color: unifiedTimer.slowMode ? "cyan" : "white"; font.pixelSize: 48 }
         }
         MouseArea {
             width: 64; height: 64
-            onClicked: debugConsoleView.visible = !debugConsoleView.visible
+            onClicked: (mouse) => { debugConsoleView.visible = !debugConsoleView.visible; }
             Text { anchors.centerIn: parent; text: "#"; color: "white"; font.pixelSize: 48; style: Text.Outline; styleColor: "black" }
         }
     }

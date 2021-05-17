@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ MouseArea {
     // mouse area after the cursor hides ("exited" is not signaled).
     // Original containsMouse condition is also needed to cover the situation of
     // dragging out of the mouse area.
-    onPositionChanged: if (containsMouse) containsMouseInternal = cursorVisible
+    onPositionChanged: (mouse) => { if (containsMouse) containsMouseInternal = cursorVisible; }
 
     // For the "Difference 2" situation described above,
     // containsMouseInternal should depend on current cursor visible state

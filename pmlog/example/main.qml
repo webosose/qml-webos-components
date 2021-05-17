@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ Rectangle {
         color: "red"
         MouseArea {
             anchors.fill: parent
-            onClicked: PmLogger.error("TEST", {"color":"red", "x":1, "y":5}, "test box");
+            onClicked: (mouse) => { PmLogger.error("TEST", {"color":"red", "x":1, "y":5}, "test box"); }
         }
     }
 
@@ -41,7 +41,7 @@ Rectangle {
         color: "yellow"
         MouseArea {
             anchors.fill: parent
-            onClicked: pmlog.debug("Debug: Test");
+            onClicked: (mouse) => { pmlog.debug("Debug: Test"); }
         }
     }
 
@@ -51,7 +51,7 @@ Rectangle {
         color: "green"
         MouseArea {
             anchors.fill: parent
-            onClicked: pmlog.info("TEST", {"color":"green", "x":5, "y":205}, "test box");
+            onClicked: (mouse) => { pmlog.info("TEST", {"color":"green", "x":5, "y":205}, "test box"); }
         }
     }
 }
