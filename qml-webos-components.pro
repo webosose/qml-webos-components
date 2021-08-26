@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2018 LG Electronics, Inc.
+# Copyright (c) 2013-2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ OBJECTS_DIR = .obj
 
 CONFIG += qt debug
 
-SUBDIRS = textfile pmlog rdxlog performancelog fpscounter pmtrace webos audioservice
+SUBDIRS = textfile pmlog performancelog fpscounter pmtrace webos audioservice
 
 no-textfile {
     SUBDIRS -= textfile
@@ -33,10 +33,6 @@ no-pmlog {
 
 no-performancelog {
     SUBDIRS -= performancelog
-}
-
-no-rdxlog {
-    SUBDIRS -= rdxlog
 }
 
 no-fpscounter {
