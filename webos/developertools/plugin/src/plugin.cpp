@@ -18,7 +18,7 @@
 #include "debugmessagefilter.h"
 #include "unifiedtimerwrapper.h"
 #include "memoryinfo.h"
-#include "fpsgraph.h"
+#include "graph.h"
 #include "resourcemonitor.h"
 
 #include <qqml.h>
@@ -31,7 +31,9 @@ void DeveloperToolsPlugin::registerTypes(const char *uri)
     qmlRegisterType<DebugMessageFilter>(uri, 1, 0, "DebugMessageFilter");
     qmlRegisterType<MemoryInfo>(uri, 1, 0, "MemoryInfo");
     qmlRegisterType<MemoryInfo::Mapping>(uri, 1, 0, "Mapping");
-    qmlRegisterType<FpsGraph>(uri, 1, 0, "FpsGraph");
+    // For backward-compatibility
+    qmlRegisterType<Graph>(uri, 1, 0, "FpsGraph");
+    qmlRegisterType<Graph>(uri, 1, 0, "Graph");
     qmlRegisterType<ResourceMonitor>(uri, 1, 0, "ResourceMonitor");
 }
 

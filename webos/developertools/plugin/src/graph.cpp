@@ -14,61 +14,75 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "fpsgraph.h"
+#include "graph.h"
 
 #include <QtQuick/qsgnode.h>
 #include <QtQuick/qsgflatcolormaterial.h>
 #include <QtGui/qopengl.h>
 #include <QDebug>
 
-class fpsGeometryNode:
+class graphGeometryNode:
     public QSGGeometryNode
 {
 public:
-    fpsGeometryNode(): QSGGeometryNode() {
+    graphGeometryNode(): QSGGeometryNode() {
         setFlag(QSGNode::UsePreprocess);
-        timer.start();
+        m_timer.start();
     }
+
     void preprocess() override {
-        int delta = timer.elapsed();
-        timer.restart();
-        msecs.append(delta);
-        while (msecs.size() > geometry()->vertexCount()) msecs.dequeue();
+        if (!m_customDataEnabled) {
+            int delta = m_timer.elapsed();
+            m_timer.restart();
+            m_dataQueue.append(delta);
+        }
+
+        while (m_dataQueue.size() > geometry()->vertexCount()) m_dataQueue.dequeue();
 
         QSGGeometry::Point2D *vertices = geometry()->vertexDataAsPoint2D();
         QList<int>::const_iterator i;
         int j=0;
-        for (i = msecs.constBegin(); i != msecs.constEnd(); ++i) {
-            qreal x = bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * bounds.width();
-            float y = bounds.bottom() - *i;
+        for (i = m_dataQueue.constBegin(); i != m_dataQueue.constEnd(); ++i) {
+            qreal x = m_bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * m_bounds.width();
+            float y = m_bounds.bottom() - *i;
             vertices[j].set(x, y);
             j++;
         }
         for(; j < geometry()->vertexCount(); j++) {
-            qreal x = bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * bounds.width();
-            float y = bounds.bottom();
+            qreal x = m_bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * m_bounds.width();
+            float y = m_bounds.bottom();
             vertices[j].set(x, y);
         }
         markDirty(DirtyGeometry);
     }
-    QRectF bounds;
-    QQueue<int> msecs;
-    QElapsedTimer timer;
+
+    void setBounds(QRectF b) { m_bounds = b; }
+
+    // Maybe: consider mutex for thread-safety
+    void addData(int data) {
+        if (Q_UNLIKELY(!m_customDataEnabled))
+            m_customDataEnabled = true;
+        m_dataQueue.append(data);
+    }
+private:
+    bool m_customDataEnabled = false; // use fps interval for graph data as default when user mode is disabled.
+    QQueue<int> m_dataQueue;
+    QElapsedTimer m_timer;
+    QRectF m_bounds;
 };
 
-
-FpsGraph::FpsGraph(QQuickItem *parent)
+Graph::Graph(QQuickItem *parent)
     : QQuickItem(parent)
     , m_sampleCount(960)
 {
     setFlag(ItemHasContents, true);
 }
 
-FpsGraph::~FpsGraph()
+Graph::~Graph()
 {
 }
 
-void FpsGraph::setSampleCount(int count)
+void Graph::setSampleCount(int count)
 {
     if (m_sampleCount == count)
         return;
@@ -78,29 +92,51 @@ void FpsGraph::setSampleCount(int count)
     update();
 }
 
-QSGNode *FpsGraph::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+void Graph::setColor(QColor color)
 {
-    fpsGeometryNode *node = 0;
+    if (m_color == color)
+        return;
+
+    m_color = color;
+    emit colorChanged();
+    update();
+}
+
+QSGNode *Graph::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+{
+    graphGeometryNode *node = 0;
     QSGGeometry *geometry = 0;
 
     if (!oldNode) {
-        node = new fpsGeometryNode();
+        node = new graphGeometryNode();
         geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), m_sampleCount);
         geometry->setLineWidth(1);
         geometry->setDrawingMode(GL_LINE_STRIP);
         node->setGeometry(geometry);
         node->setFlag(QSGNode::OwnsGeometry);
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-        material->setColor(QColor(255, 0, 0));
+        // Consider what if color is set after first updatePaintNode
+        material->setColor(m_color);
         node->setMaterial(material);
         node->setFlag(QSGNode::OwnsMaterial);
+        // Consider its life cycle if we want to delete the node in someday
+        m_node = node;
     } else {
-        node = static_cast<fpsGeometryNode *>(oldNode);
+        node = static_cast<graphGeometryNode *>(oldNode);
         geometry = node->geometry();
         geometry->allocate(m_sampleCount);
     }
 
-    node->bounds = boundingRect();
+    node->setBounds(boundingRect());
     node->markDirty(QSGNode::DirtyGeometry);
+
     return node;
+}
+
+void Graph::addData(int data)
+{
+    if (!m_node)
+        return;
+    graphGeometryNode *node = static_cast<graphGeometryNode *>(m_node);
+    node->addData(data);
 }
