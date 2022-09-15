@@ -309,7 +309,7 @@ bool AudioService::handleVolumeUpdate(LSHandle *handle, LSMessage *reply, void *
     payload = LSMessageGetPayload(reply);
 
     QJsonObject rootObject = QJsonDocument::fromJson(payload).object();
-    result = rootObject.find("returnValue").value().toBool();
+    result = rootObject.value("returnValue").toBool();
     if (result) {
         AudioService *svc = static_cast<AudioService *>(ctx);
         if (!svc->m_isSubscribed) {
@@ -336,7 +336,7 @@ bool AudioService::handleMuteUpdate(LSHandle *handle, LSMessage *reply, void *ct
     payload = LSMessageGetPayload(reply);
 
     QJsonObject rootObject = QJsonDocument::fromJson(payload).object();
-    result = rootObject.find("returnValue").value().toBool();
+    result = rootObject.value("returnValue").toBool();
     if (result) {
         AudioService *svc = static_cast<AudioService *>(ctx);
         if (!svc->m_isSubscribed) {
@@ -365,17 +365,17 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
     payload = LSMessageGetPayload(reply);
 
     QJsonObject rootObject = QJsonDocument::fromJson(payload).object();
-    result = rootObject.find("returnValue").value().toBool();
-    subscribed = rootObject.find("subscribed").value().toBool();
-    action = rootObject.find("action").value().toString();
+    result = rootObject.value("returnValue").toBool();
+    subscribed = rootObject.value("subscribed").toBool();
+    action = rootObject.value("action").toString();
     if (result) {
         AudioService *svc = static_cast<AudioService *>(ctx);
-        int volume = (int)rootObject.find("volume").value().toDouble();
-        int volumeMax = (int)rootObject.find("volumeMax").value().toDouble();
-        bool muted = rootObject.find("muted").value().toBool();
-        QString scenario = rootObject.find("scenario").value().toString();
-        QString cause = rootObject.find("cause").value().toString();
-        QString volumeOsd = rootObject.find("volumeOsd").value().toString();
+        int volume = (int)rootObject.value("volume").toDouble();
+        int volumeMax = (int)rootObject.value("volumeMax").toDouble();
+        bool muted = rootObject.value("muted").toBool();
+        QString scenario = rootObject.value("scenario").toString();
+        QString cause = rootObject.value("cause").toString();
+        QString volumeOsd = rootObject.value("volumeOsd").toString();
 
         // Set subscribed upon "subscribed":true
         if (!svc->m_isSubscribed && subscribed) {
@@ -392,7 +392,7 @@ bool AudioService::handleGetVolume(LSHandle *handle, LSMessage *reply, void *ctx
         // Update values
         if (action == "changed" || action == "requested" || action == "enabled") {
             if (action == "changed") {
-                QStringList changed = QVariant(rootObject.find("changed").value().toArray().toVariantList()).toStringList();
+                QStringList changed = QVariant(rootObject.value("changed").toArray().toVariantList()).toStringList();
                 svc->setChanged(changed);
             }
             svc->setVolume(volume);
