@@ -90,6 +90,11 @@ bool FpsCounter::touch()
 
 void FpsCounter::countFps()
 {
+    if (frameCounter == INT_MAX) {
+        qWarning() << "frameCounter is not a valid value";
+        frameCounter = 0;
+        return;
+    }
     frameCounter++;
 }
 

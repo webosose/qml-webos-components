@@ -73,7 +73,10 @@ void MemoryInfo::updateTotals()
         foreach (Mapping* m, m_requestedMappings) {
             int ov = m_totals->value(c).toInt();
             int nv = m->m_map->value(c).toInt();
-
+            if (nv > 0 && ov > (INT_MAX - nv) || nv < 0 && ov < (INT_MIN - nv)) {
+                qWarning() << "Total of ov and nv cannot be greather than " << INT_MAX << "or less than " << INT_MIN;
+                continue;
+            }
             m_totals->insert(c, ov + nv);
             emit m_totals->valueChanged(c, ov + nv);
         }
@@ -151,6 +154,10 @@ void MemoryInfo::Mapping::read(MemoryInfo* info, QTextStream* in)
             int value = split.at(1).trimmed().toInt();
             if (info->m_categories.contains(category)) {
                 int old = m_map->value(category).toInt();
+                if ((value > 0 && old > (INT_MAX - value)) || (value < 0 && old < (INT_MIN - value))) {
+                    qWarning() << "old cannot be greater than or less than " << INT_MAX << " or " << INT_MIN;
+                    continue;
+                }
                 m_map->insert(category, old + value);
                 emit m_map->valueChanged(category, old + value);
             }

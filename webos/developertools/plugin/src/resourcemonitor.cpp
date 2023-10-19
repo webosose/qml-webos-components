@@ -43,12 +43,19 @@ bool CpuStat::update() {
     consumeTime = cur.user - prev.user +
         cur.nice - prev.nice +
         cur.sys - prev.sys;
+
+    if (cur.idle > ULONG_MAX - consumeTime) {
+        qWarning() << "Cannot increase cur.idle greater than " << ULONG_MAX;
+        return false;
+    }
+
     totalTime = consumeTime + cur.idle - prev.idle;
 
-    if (totalTime != 0)
-        cpuUsage = 100 * consumeTime / totalTime;
-    else
+    if (totalTime != 0 && (consumeTime <= ULONG_MAX / 100UL)) {
+        cpuUsage = 100UL * consumeTime / totalTime;
+    } else {
         cpuUsage = 0.0;
+    }
 
     prev = cur;
 
@@ -56,30 +63,33 @@ bool CpuStat::update() {
 }
 
 bool CpuStat::loadStat(struct cstat &s) {
-    FILE *fp;
-
-    if ((fp = fopen(procStat, "r")) == NULL) {
-        perror(__FUNCTION__);
+    QFile file(procStat);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Cannot open " << procStat;
         return false;
     }
 
-   fscanf(fp, "%*s %lu %lu %lu %lu",
-       &s.user,
-       &s.nice,
-       &s.sys,
-       &s.idle);
+    QString tmp;
+    QByteArray text = file.readAll();
+    QTextStream stream(&text);
+    stream >> tmp >> s.user >> s.nice >> s.sys >> s.idle;
+    if (stream.status() != QTextStream::Ok) {
+        qWarning() << "Failed to parse the contents of " << procStat;
+        return false;
+    }
 
-   fclose(fp);
-
-   return true;
+    return true;
 }
-
 
 size_t MemStat::getMemTotal() {
     return mstat["MemTotal"];
 }
 
 size_t MemStat::getMemUsed() {
+    if (mstat["MemTotal"] < mstat["MemFree"]) {
+        qWarning() << "mstat for MemTotal cannot be less than " << 0U;
+        return 0;
+    }
     return mstat["MemTotal"] - mstat["MemFree"];
 }
 
@@ -96,6 +106,10 @@ size_t MemStat::getSwapTotal() {
 }
 
 size_t MemStat::getSwapUsed() {
+    if (mstat["SwapTotal"] < mstat["SwapFree"]) {
+        qWarning() << "mstat for SwapTotal cannot be less than " << 0U;
+        return 0;
+    }
     return mstat["SwapTotal"] - mstat["SwapFree"];
 }
 
@@ -117,7 +131,10 @@ bool MemStat::update() {
         key[strlen(key)-1] = '\0';
         mstat[key] = value;
     }
-    fclose(fp);
+    if (EOF == fclose(fp)) {
+        qWarning() << "Faild to close " << procVmStat;
+        return false;
+    }
 
     return true;
 }
@@ -148,32 +165,32 @@ double ResourceMonitor::cpuUsage()
     return cpuStat.getCpuUsage();
 }
 
-unsigned int ResourceMonitor::memTotal()
+size_t ResourceMonitor::memTotal()
 {
     return memStat.getMemTotal();
 }
 
-unsigned int ResourceMonitor::memUsed()
+size_t ResourceMonitor::memUsed()
 {
     return memStat.getMemUsed();
 }
 
-unsigned int ResourceMonitor::buffers()
+size_t ResourceMonitor::buffers()
 {
     return memStat.getBuffers();
 }
 
-unsigned int ResourceMonitor::cached()
+size_t ResourceMonitor::cached()
 {
     return memStat.getCached();
 }
 
-unsigned int ResourceMonitor::swapTotal()
+size_t ResourceMonitor::swapTotal()
 {
     return memStat.getSwapTotal();
 }
 
-unsigned int ResourceMonitor::swapUsed()
+size_t ResourceMonitor::swapUsed()
 {
     return memStat.getSwapUsed();
 }

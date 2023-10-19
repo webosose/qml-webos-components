@@ -48,7 +48,7 @@ private:
     /*
      * time difference calculation
      */
-    int timeDiff(const struct timespec& startTime, const struct timespec& endTime);
+    long int timeDiff(const struct timespec& startTime, const struct timespec& endTime);
     /*
      * performance time logging
      */

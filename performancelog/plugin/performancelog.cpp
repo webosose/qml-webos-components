@@ -25,6 +25,7 @@
 
 #include <QJsonDocument>
 #include <QJsonValue>
+#include <QDebug>
 
 using namespace std;
 
@@ -81,8 +82,12 @@ void PerformanceLog::timeEnd(const QString &messageId, const QJsonObject &keyVal
         {
             QJsonObject keyValPairs = keyVals;
             struct timespec startTime = s_performanceMap.take(point);
-            int msec = timeDiff(startTime, currentTime);
-
+            long int diff = timeDiff(startTime, currentTime);
+            if (diff > INT_MAX || diff < INT_MIN) {
+                qWarning() << "timeDiff cannot be greater than " << INT_MAX << " or less than " << INT_MIN;
+                return;
+            }
+            int msec = (int) diff;
             keyValPairs.insert("TIME", QJsonValue(msec));
             keyValPairs.insert("UNIT", QJsonValue(QString("ms")));
 
@@ -138,10 +143,28 @@ void PerformanceLog::logInfoWithClock(const QString &messageId, const QJsonObjec
 }
 #endif
 
-int PerformanceLog::timeDiff(const struct timespec& startTime, const struct timespec& endTime)
+long int PerformanceLog::timeDiff(const struct timespec& startTime, const struct timespec& endTime)
 {
-    return (endTime.tv_sec - startTime.tv_sec)*1000 +     // convert seconds to milliseconds
-           (endTime.tv_nsec - startTime.tv_nsec)/1000000; // convert nanoseconds to milliseconds
+    if (startTime.tv_sec > 0L && endTime.tv_sec < (LONG_MIN + startTime.tv_sec) || startTime.tv_sec < 0L && endTime.tv_sec > (LONG_MAX + startTime.tv_sec)) {
+        qWarning() << "endTime.tv_sec cannot be less than " << LONG_MIN << " or greater than " << LONG_MAX;
+        return 0;
+    }
+    if (startTime.tv_nsec > 0L && endTime.tv_nsec < (LONG_MIN + startTime.tv_nsec) || startTime.tv_nsec < 0L && endTime.tv_nsec > (LONG_MAX + startTime.tv_nsec)) {
+        qWarning() << "endTime.tv_nsec cannot be less than " << LONG_MIN << " or greater than " << LONG_MAX;
+        return 0;
+    }
+
+    if (endTime.tv_sec - startTime.tv_sec > (LONG_MAX / 1000L)) {
+        qWarning() << "secToMs cannot be greater than " << LONG_MAX;
+        return 0;
+    }
+    long int secToMs = (endTime.tv_sec - startTime.tv_sec) * 1000L;
+    long int nsToMs = (endTime.tv_nsec - startTime.tv_nsec) / 1000000L;
+    if (nsToMs > 0 && secToMs > (LONG_MAX - nsToMs) || nsToMs < 0 && secToMs < (LONG_MIN - nsToMs)) {
+        qWarning() << "timeDiff cannot be greater than " << LONG_MAX << " or less than " << LONG_MIN;
+        return 0;
+    }
+    return secToMs + nsToMs;
 }
 
 #ifndef HAS_PMLOGLIB

@@ -32,24 +32,24 @@ public:
 
     void preprocess() override {
         if (!m_customDataEnabled) {
-            int delta = m_timer.elapsed();
+            int64_t delta = m_timer.elapsed();
             m_timer.restart();
             m_dataQueue.append(delta);
         }
 
-        while (m_dataQueue.size() > geometry()->vertexCount()) m_dataQueue.dequeue();
+        int vertexCount = geometry()->vertexCount();
+        while (m_dataQueue.size() > vertexCount) m_dataQueue.dequeue();
 
         QSGGeometry::Point2D *vertices = geometry()->vertexDataAsPoint2D();
-        QList<int>::const_iterator i;
+        QList<int64_t>::const_iterator i;
         int j=0;
-        for (i = m_dataQueue.constBegin(); i != m_dataQueue.constEnd(); ++i) {
-            qreal x = m_bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * m_bounds.width();
+        for (i = m_dataQueue.constBegin(); i != m_dataQueue.constEnd() && j < vertexCount; ++i, ++j) {
+            qreal x = m_bounds.x() + qreal(j) / qreal(vertexCount - 1) * m_bounds.width();
             float y = m_bounds.bottom() - *i;
             vertices[j].set(x, y);
-            j++;
         }
-        for(; j < geometry()->vertexCount(); j++) {
-            qreal x = m_bounds.x() + qreal(j) / qreal(geometry()->vertexCount() - 1) * m_bounds.width();
+        for(; j < vertexCount; j++) {
+            qreal x = m_bounds.x() + qreal(j) / qreal(vertexCount - 1) * m_bounds.width();
             float y = m_bounds.bottom();
             vertices[j].set(x, y);
         }
@@ -59,14 +59,14 @@ public:
     void setBounds(QRectF b) { m_bounds = b; }
 
     // Maybe: consider mutex for thread-safety
-    void addData(int data) {
+    void addData(int64_t data) {
         if (Q_UNLIKELY(!m_customDataEnabled))
             m_customDataEnabled = true;
         m_dataQueue.append(data);
     }
 private:
     bool m_customDataEnabled = false; // use fps interval for graph data as default when user mode is disabled.
-    QQueue<int> m_dataQueue;
+    QQueue<int64_t> m_dataQueue;
     QElapsedTimer m_timer;
     QRectF m_bounds;
 };
@@ -133,7 +133,7 @@ QSGNode *Graph::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     return node;
 }
 
-void Graph::addData(int data)
+void Graph::addData(int64_t data)
 {
     if (!m_node)
         return;

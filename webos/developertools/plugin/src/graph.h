@@ -37,7 +37,7 @@ public:
     QColor color() { return m_color; }
     void setColor(QColor color);
 
-    Q_INVOKABLE void addData(int data);
+    Q_INVOKABLE void addData(int64_t data);
 signals:
     void sampleCountChanged(int count);
     void colorChanged();

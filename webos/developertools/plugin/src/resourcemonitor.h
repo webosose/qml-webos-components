@@ -76,22 +76,22 @@ class ResourceMonitor : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(double cpuUsage READ cpuUsage NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int memTotal READ memTotal NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int memUsed READ memUsed NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int buffers READ buffers NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int cached READ cached NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int swapTotal READ swapTotal NOTIFY valueChanged)
-    Q_PROPERTY(unsigned int swapUsed READ swapUsed NOTIFY valueChanged)
+    Q_PROPERTY(size_t memTotal READ memTotal NOTIFY valueChanged)
+    Q_PROPERTY(size_t memUsed READ memUsed NOTIFY valueChanged)
+    Q_PROPERTY(size_t buffers READ buffers NOTIFY valueChanged)
+    Q_PROPERTY(size_t cached READ cached NOTIFY valueChanged)
+    Q_PROPERTY(size_t swapTotal READ swapTotal NOTIFY valueChanged)
+    Q_PROPERTY(size_t swapUsed READ swapUsed NOTIFY valueChanged)
 
 public:
     ResourceMonitor(QQuickItem *parent = 0);
     double cpuUsage();
-    unsigned int memTotal();
-    unsigned int memUsed();
-    unsigned int buffers();
-    unsigned int cached();
-    unsigned int swapTotal();
-    unsigned int swapUsed();
+    size_t memTotal();
+    size_t memUsed();
+    size_t buffers();
+    size_t cached();
+    size_t swapTotal();
+    size_t swapUsed();
 
 private:
     static const int refreshInterval = 1000;
